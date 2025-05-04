@@ -1,7 +1,6 @@
 let humanScore = 0;
 let computerScore = 0;
 
-
 function getComputerChoice() {
     // Gives the range of a possible combination from (0*3 + 1*3) + 1 => 1 to 3
     let choice = Math.floor(Math.random() * 3) + 1;
