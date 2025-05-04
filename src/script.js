@@ -1,5 +1,14 @@
 let humanScore = 0;
 let computerScore = 0;
+let items = Array.from(document.querySelectorAll('.item-block'));
+
+items.forEach(item => item.addEventListener('click', initiateRound));
+
+let PAPER = 'paper';
+let ROCK = 'rock';
+let SCISSORS = 'scissors';
+
+let scoreBlock = document.querySelector('.result-block');
 
 function getComputerChoice() {
     // Gives the range of a possible combination from (0*3 + 1*3) + 1 => 1 to 3
@@ -8,43 +17,44 @@ function getComputerChoice() {
 
     switch (choice) {
         case 1:
-            variation = 'scissors';
+            variation = SCISSORS;
             break;
         case 2:
-            variation = 'rock';
+            variation = ROCK;
             break;
         case 3:
-            variation = 'paper';
+            variation = PAPER;
             break;
     }
     return variation;
 }
 
-function getHumanChoice() {
+function getHumanChoicePrompt() {
     let userResponse;
-    while (1 === 1) {
+    while (true) {
         userResponse = prompt('What do you choose? Rock, Paper or Scissors?').toLowerCase();
-        if (userResponse === 'rock' || userResponse === 'paper' || userResponse === 'scissors') {
+        if (userResponse === ROCK || userResponse === PAPER || userResponse === SCISSORS) {
             return userResponse;
         }
         alert('Give the appropriate value');
     }
 }
 
+
 let round = function (humanChoice, computerChoice) {
     if (humanChoice === computerChoice) {
         return 'Draw';
     }
-    if (humanChoice === 'rock' && computerChoice === 'scissors') {
+    if (humanChoice === ROCK && computerChoice === SCISSORS) {
         humanScore++;
         return `Human Wins! ${humanChoice} beats ${computerChoice}`;
     }
-    if (humanChoice === 'paper' && computerChoice === 'rock') {
+    if (humanChoice === PAPER && computerChoice === ROCK) {
         humanScore++;
         return `Human Wins! ${humanChoice} beats ${computerChoice}`;
 
     }
-    if (humanChoice === 'scissors' && computerChoice === 'paper') {
+    if (humanChoice === SCISSORS && computerChoice === PAPER) {
         humanScore++;
         return `Human Wins! ${humanChoice} beats ${computerChoice}`;
     }
@@ -52,32 +62,43 @@ let round = function (humanChoice, computerChoice) {
     return `Computer Wins! ${computerChoice} beats ${humanChoice}`;
 }
 
-function playGame() {
-    let i = 0
-    while (i !== 5) {
-        const humanChoice = getHumanChoice();
-        const computerChoice = getComputerChoice();
-        let result = round(humanChoice, computerChoice);
-        console.log(`Round ${i + 1} with result: ${result}`);
-        if (humanScore === 3 || computerScore === 3) {
-            break;
-        }
-        i++;
-    }
-    if (humanScore > computerScore) {
-        alert(`You won ${humanScore} - ${computerScore}`);
-    } else if (humanScore < computerScore) {
-        alert(`You lost ${computerScore} - ${humanScore}`);
-    } else {
-        alert(`It's a draw ${humanScore} - ${computerScore}`);
-    }
-    let conclusion = prompt('Do you want to drop score?(yes)').toLowerCase();
-    if (conclusion === 'yes') {
-        humanScore = 0;
-        computerScore = 0;
-    } else {
-        console.log(`Current score: ${humanScore} - ${computerScore}`);
-    }
+
+function initiateRound(event) {
+    let humanChoice = event.currentTarget.dataset.choice;
+    playRound(humanChoice);
 }
 
+function playRound(humanChoice) {
+
+    const computerChoice = getComputerChoice();
+    scoreBlock.textContent = round(humanChoice, computerChoice);
+    scoreBlock.append(document.createTextNode(` ${humanScore} - ${computerScore}`))
+    if (humanScore === 5 || computerScore === 5) {
+        let result = document.createElement('h2');
+        result.color = 'red';
+        if (humanScore > computerScore) {
+            result.textContent = `You won ${humanScore} - ${computerScore}`;
+        } else {
+            result.textContent = `You lost ${humanScore} - ${computerScore}`;
+        }
+        document.querySelector('.changes-container').append(result);
+        items.forEach(item => {
+            item.removeEventListener('click', initiateRound);
+        })
+        let reset = document.createElement('button');
+        reset.textContent = 'Reset';
+        reset.style.padding= '10px';
+        document.body.append(reset);
+        reset.addEventListener('click',() =>{
+            humanScore = 0;
+            computerScore = 0;
+            scoreBlock.textContent = '';
+            result.remove();
+            items.forEach(item => {
+                item.addEventListener('click', initiateRound);
+            })
+            reset.remove();
+        })
+    }
+}
 
